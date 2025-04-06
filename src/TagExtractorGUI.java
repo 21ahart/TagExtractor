@@ -1,3 +1,4 @@
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -26,25 +27,55 @@ public class TagExtractorGUI extends JFrame {
         setLocationRelativeTo(null); // Center the window on the screen
 
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Vertical layout for the panel
 
+        // Panel for "Choose Text File" button and its label
+        JPanel textFilePanel = new JPanel();
+        textFilePanel.setLayout(new BoxLayout(textFilePanel, BoxLayout.Y_AXIS));
         JButton chooseTextButton = new JButton("Choose Text File");
         chooseTextButton.addActionListener(e -> chooseFile("text"));
+        textFilePanel.add(chooseTextButton);
+        textFilePanel.add(textLabel);
 
-        chooseTextButton.add(textLabel);
-
+        // Panel for "Choose Stop Words File" button and its label
+        JPanel stopWordsFilePanel = new JPanel();
+        stopWordsFilePanel.setLayout(new BoxLayout(stopWordsFilePanel, BoxLayout.Y_AXIS));
         JButton chooseStopWordsButton = new JButton("Choose Stop Words File");
         chooseStopWordsButton.addActionListener(e -> chooseFile("stop"));
+        stopWordsFilePanel.add(chooseStopWordsButton);
+        stopWordsFilePanel.add(stopWordsLabel);
 
-        chooseStopWordsButton.add(stopWordsLabel);
+        // Add the panels to the main button panel
+        buttonPanel.add(textFilePanel);
+        buttonPanel.add(stopWordsFilePanel);
 
+        // Add the "Extract Tags" and "Save Extracted Tags" buttons
         JButton extractTagsButton = new JButton("Extract Tags");
-        extractTagsButton.addActionListener(e -> {
-            runAlgorithm();
+        extractTagsButton.addActionListener(e -> runAlgorithm());
+        buttonPanel.add(extractTagsButton);
+
+        JButton saveExtractedTagsButton = new JButton("Save Extracted Tags");
+        saveExtractedTagsButton.addActionListener(e -> {
+            if (results == null || results.isEmpty()) {
+                resultArea.setText("No results to save. Please run the algorithm first.");
+                return;
+            }
+            
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Save Extracted Tags");
+            int userSelection = fileChooser.showSaveDialog(this);
+            if (userSelection == JFileChooser.APPROVE_OPTION) {
+                File fileToSave = fileChooser.getSelectedFile();
+                String filePath = fileToSave.getAbsolutePath();
+                SaveToFile saveToFile = new SaveToFile(results, filePath);
+                saveToFile.saveToFile();
+            }
         });
 
         buttonPanel.add(chooseTextButton);
         buttonPanel.add(chooseStopWordsButton);
         buttonPanel.add(extractTagsButton);
+        buttonPanel.add(saveExtractedTagsButton);
         add(buttonPanel, BorderLayout.NORTH);
 
         JPanel textPanel = new JPanel();

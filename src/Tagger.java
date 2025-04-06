@@ -1,4 +1,6 @@
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Tagger {
     private String fileAsString;
@@ -6,7 +8,7 @@ public class Tagger {
     private HashMap<String, Integer> wordCountMap = new HashMap<>();
 
     public Tagger(String fileAsString, String stopFileAsString) {
-        this.fileAsString = fileAsString.toLowerCase();
+        this.fileAsString = fileAsString.replaceAll("[^a-zA-Z\\s]", "").toLowerCase();
         this.stopFileAsString = stopFileAsString.toLowerCase();
 
         countUniqueWords();
@@ -35,9 +37,11 @@ public class Tagger {
     }
 
     public String wordCountMapToString() {
+        Map<String, Integer> sortedMap = new TreeMap<>(wordCountMap);
+
         StringBuilder sb = new StringBuilder();
-        for (String word : wordCountMap.keySet()) {
-            sb.append(word).append(": ").append(wordCountMap.get(word)).append("\n");
+        for (String word : sortedMap.keySet()) {
+            sb.append(word).append(": ").append(sortedMap.get(word)).append("\n");
         }
         return sb.toString();
     }
